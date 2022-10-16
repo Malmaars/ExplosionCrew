@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.02.00">
+	<object class="AudioFile" id="{b3b67720-5d4b-4eb7-9ed0-158f1dc5108a}">
+		<property name="assetPath">
+			<value>Music/Stems/Analog Pad.3.wav</value>
+		</property>
+		<property name="isStreaming">
+			<value>true</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>44.0999985</value>
+		</property>
+		<property name="channelCount">
+			<value>2</value>
+		</property>
+		<property name="length">
+			<value>12</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{69cf5b60-58dc-4f2f-b972-b072f3bc941f}</destination>
+		</relationship>
+	</object>
+</objects>
