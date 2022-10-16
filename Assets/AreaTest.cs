@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class AreaTest : MonoBehaviour
 {
+    public int whatArea;
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.name == "Player")
