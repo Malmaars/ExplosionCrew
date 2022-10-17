@@ -136,6 +136,7 @@ GameObject:
   - component: {fileID: 1140331}
   - component: {fileID: 1140330}
   - component: {fileID: 1140333}
+  - component: {fileID: 1140334}
   m_Layer: 0
   m_Name: Area2
   m_TagString: Untagged
@@ -232,6 +233,38 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   whatArea: 0
+--- !u!114 &1140334
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1140328}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a6610d2e704f1648819acc8d7460285, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  CollisionTag: Player
+  EventReference:
+    Guid:
+      Data1: -1526337559
+      Data2: 1129516303
+      Data3: 860549800
+      Data4: 713801930
+    Path: event:/Music
+  Event: 
+  PlayEvent: 3
+  StopEvent: 0
+  AllowFadeout: 1
+  TriggerOnce: 0
+  Preload: 0
+  Params:
+  - Name: Area
+    Value: 1.5
+  OverrideAttenuation: 0
+  OverrideMinDistance: 1
+  OverrideMaxDistance: 20
 --- !u!1 &116399639
 GameObject:
   m_ObjectHideFlags: 0
@@ -354,24 +387,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a6610d2e704f1648819acc8d7460285, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CollisionTag: 
+  CollisionTag: Player
   EventReference:
     Guid:
-      Data1: 0
-      Data2: 0
-      Data3: 0
-      Data4: 0
-    Path: 
+      Data1: -1526337559
+      Data2: 1129516303
+      Data3: 860549800
+      Data4: 713801930
+    Path: event:/Music
   Event: 
-  PlayEvent: 0
+  PlayEvent: 3
   StopEvent: 0
   AllowFadeout: 1
   TriggerOnce: 0
   Preload: 0
-  Params: []
+  Params:
+  - Name: Area
+    Value: 0.5
   OverrideAttenuation: 0
-  OverrideMinDistance: -1
-  OverrideMaxDistance: -1
+  OverrideMinDistance: 1
+  OverrideMaxDistance: 20
 --- !u!1 &408625746
 GameObject:
   m_ObjectHideFlags: 0
@@ -514,7 +549,7 @@ GameObject:
   - component: {fileID: 791203311}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -619,6 +654,7 @@ GameObject:
   - component: {fileID: 963194228}
   - component: {fileID: 963194227}
   - component: {fileID: 963194226}
+  - component: {fileID: 963194229}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -696,6 +732,24 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
+--- !u!114 &963194229
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 963194225}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b9468c5f457ace64f8d4df6d642b107f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  LoadEvent: 1
+  UnloadEvent: 0
+  Banks:
+  - Music
+  CollisionTag: 
+  PreloadSamples: 0
 --- !u!1 &1902411231
 GameObject:
   m_ObjectHideFlags: 0
@@ -709,6 +763,7 @@ GameObject:
   - component: {fileID: 1902411234}
   - component: {fileID: 1902411233}
   - component: {fileID: 1902411236}
+  - component: {fileID: 1902411237}
   m_Layer: 0
   m_Name: Area3
   m_TagString: Untagged
@@ -805,6 +860,38 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   whatArea: 0
+--- !u!114 &1902411237
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1902411231}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a6610d2e704f1648819acc8d7460285, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  CollisionTag: Player
+  EventReference:
+    Guid:
+      Data1: -1526337559
+      Data2: 1129516303
+      Data3: 860549800
+      Data4: 713801930
+    Path: event:/Music
+  Event: 
+  PlayEvent: 3
+  StopEvent: 0
+  AllowFadeout: 1
+  TriggerOnce: 0
+  Preload: 0
+  Params:
+  - Name: Area
+    Value: 2.5
+  OverrideAttenuation: 0
+  OverrideMinDistance: 1
+  OverrideMaxDistance: 20
 --- !u!1 &1915188157
 GameObject:
   m_ObjectHideFlags: 0
@@ -818,6 +905,7 @@ GameObject:
   - component: {fileID: 1915188160}
   - component: {fileID: 1915188159}
   - component: {fileID: 1915188162}
+  - component: {fileID: 1915188163}
   m_Layer: 0
   m_Name: Area4
   m_TagString: Untagged
@@ -914,3 +1002,35 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   whatArea: 0
+--- !u!114 &1915188163
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1915188157}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a6610d2e704f1648819acc8d7460285, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  CollisionTag: Player
+  EventReference:
+    Guid:
+      Data1: -1526337559
+      Data2: 1129516303
+      Data3: 860549800
+      Data4: 713801930
+    Path: event:/Music
+  Event: 
+  PlayEvent: 3
+  StopEvent: 0
+  AllowFadeout: 1
+  TriggerOnce: 0
+  Preload: 0
+  Params:
+  - Name: Area
+    Value: 3.5
+  OverrideAttenuation: 0
+  OverrideMinDistance: 1
+  OverrideMaxDistance: 20

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Serialization;
+using Cinemachine;
 
 public class PlayerMovement : MonoBehaviour 
 {
@@ -10,12 +11,14 @@ public class PlayerMovement : MonoBehaviour
     public int airBoostAmount;
     int airBoostCount;
     public ParticleSystem airBoostParticles;
+    public Speedometer boostAmountUI;
 
     [Header("Ground Boost")]
     public int groundBoostPower;
     public float groundBoostTimer;
     public float groundBoostSlowdown;
     public ParticleSystem groundBoostParticles;
+    CinemachineBasicMultiChannelPerlin cameraNoise;
 
     [Header("Base Movement Variables")]
     public float maxMovementSpeed;
@@ -23,13 +26,17 @@ public class PlayerMovement : MonoBehaviour
     public float movementSpeed;
     public float jumpSpeed;
     Vector3 lastMovementInputDirection;
+    public Speedometer speedometer;
+
+    [Header("Camera")]
+    public CinemachineVirtualCamera playerCamera;
 
     float distToGround;
     Rigidbody rb;
     Collider playerCollider;
 
     PlayerInputActions playerControls;
-    InputAction move, fire, jump;
+    InputAction move, attack, jump;
     // Start is called before the first frame update
     void Awake()
     {
@@ -37,6 +44,7 @@ public class PlayerMovement : MonoBehaviour
         playerControls = new PlayerInputActions();
         rb = GetComponent<Rigidbody>();
         playerCollider = GetComponent<Collider>();
+        cameraNoise = playerCamera.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
 
         distToGround = playerCollider.bounds.extents.y;
     }
@@ -46,9 +54,9 @@ public class PlayerMovement : MonoBehaviour
         move = playerControls.Player.Move;
         move.Enable();
 
-        fire = playerControls.Player.Fire;
-        fire.Enable();
-        fire.performed += MovementBoost;
+        attack = playerControls.Player.Attack;
+        attack.Enable();
+        attack.performed += MovementBoost;
 
         jump = playerControls.Player.Jump;
         jump.Enable();
@@ -60,14 +68,20 @@ public class PlayerMovement : MonoBehaviour
     private void OnDisable()
     {
         move.Disable();
-        fire.Disable();
+        attack.Disable();
         jump.Disable(); 
     }
 
     // Update is called once per frame
     void Update()
     {
-        Move();        
+        if (IsGrounded())
+        {
+            airBoostCount = airBoostAmount;
+        }
+
+        Move();
+        boostAmountUI.UpdateText(airBoostCount.ToString());
     }
     bool IsGrounded() 
     {
@@ -106,6 +120,9 @@ public class PlayerMovement : MonoBehaviour
             }
         }
 
+        cameraNoise.m_AmplitudeGain = movementSpeed / 10;
+
+
         //change the placement of the values for 3d use.
 
         float Horizontal = moveDirection.x * movementSpeed * Time.deltaTime;
@@ -131,6 +148,8 @@ public class PlayerMovement : MonoBehaviour
 
         transform.position += movement * movementSpeed;
         //Debug.Log(movementSpeed);
+
+        speedometer.UpdateText(((int)(movementSpeed * 6)).ToString());
     }
 
     //I believe the parameter is to assign a button? I can assign functions to button events now
@@ -138,8 +157,6 @@ public class PlayerMovement : MonoBehaviour
     {
         if (IsGrounded())
         {
-            airBoostCount = airBoostAmount;
-
             rb.AddForce(Vector3.up * jumpSpeed, ForceMode.Impulse);
         }
 
@@ -163,7 +180,7 @@ public class PlayerMovement : MonoBehaviour
         //instead of adding force to the rigidbody, I should boost up the max movementspeed;
         //rb.AddForce(transform.forward * groundBoostPower, ForceMode.Impulse);
 
-        maxMovementSpeed += 1;
+        maxMovementSpeed += 2;
         movementSpeed += 1;
 
     }
