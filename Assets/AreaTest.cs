@@ -1,31 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using FMOD;
+using FMODUnity;
+using FMODUnityResonance;
 
 public class AreaTest : MonoBehaviour
 {
-    public int whatArea;
-    private void OnTriggerEnter(Collider other)
+    public StudioEventEmitter emitter;
+    private void Update()
     {
-        if (other.gameObject.name == "Player")
-        {
-
-        }
-    }
-
-    private void OnTriggerStay(Collider other)
-    {
-        if (other.gameObject.name == "Player")
-        {
-
-        }
-    }
-
-    private void OnTriggerExit(Collider other)
-    {
-        if (other.gameObject.name == "Player")
-        {
-
-        }
+        float whatIsTheArea;
+        emitter.EventInstance.getParameterByName("Area", out whatIsTheArea);
+        UnityEngine.Debug.Log(whatIsTheArea);
     }
 }
