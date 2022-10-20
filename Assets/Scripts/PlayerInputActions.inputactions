@@ -30,14 +30,6 @@
                     "interactions": ""
                 },
                 {
-                    "name": "Attack",
-                    "type": "Button",
-                    "id": "2d6761e8-87ac-450a-8ce1-484c1a57ec04",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": ""
-                },
-                {
                     "name": "Aim",
                     "type": "Button",
                     "id": "b1945a03-3c53-4a1a-b60c-64c9214d0f97",
@@ -49,6 +41,14 @@
                     "name": "Focus",
                     "type": "Button",
                     "id": "ea567497-dc5c-439a-b071-302e7e8521c6",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "Boost",
+                    "type": "Button",
+                    "id": "943a1ce2-1ad0-4176-8d60-d18fb29cf681",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": ""
@@ -245,7 +245,7 @@
                 {
                     "name": "",
                     "id": "386fe0ea-5931-4045-98c7-662a489ecb91",
-                    "path": "<Gamepad>/buttonSouth",
+                    "path": "<Gamepad>/rightShoulder",
                     "interactions": "",
                     "processors": "",
                     "groups": "Gamepad",
@@ -261,28 +261,6 @@
                     "processors": "",
                     "groups": "Keyboard&Mouse",
                     "action": "Jump",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "dc50e9de-dd7a-402a-9b62-90507905da51",
-                    "path": "<Gamepad>/buttonEast",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Gamepad",
-                    "action": "Attack",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "2a60ddbf-8d82-42cd-838a-16a38111c880",
-                    "path": "<Keyboard>/leftShift",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Keyboard&Mouse",
-                    "action": "Attack",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -373,6 +351,61 @@
                     "action": "Focus",
                     "isComposite": false,
                     "isPartOfComposite": false
+                },
+                {
+                    "name": "DirectionalBoost",
+                    "id": "75bf0a80-ca2a-45de-b881-eb1d14e3e442",
+                    "path": "Dpad",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Boost",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "up",
+                    "id": "f24c3d9c-945f-486a-99ad-0fcfc5b9181a",
+                    "path": "<Gamepad>/buttonNorth",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "Boost",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "down",
+                    "id": "9947dae1-c4bc-42ee-88d1-96cf7e41ee43",
+                    "path": "<Gamepad>/buttonSouth",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "Boost",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "left",
+                    "id": "18325c1b-04eb-4b82-8ff5-3a37d863da0e",
+                    "path": "<Gamepad>/buttonWest",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "Boost",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "right",
+                    "id": "3c0778ca-c2a9-44ef-b64c-7f6333ca1033",
+                    "path": "<Gamepad>/buttonEast",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "Boost",
+                    "isComposite": false,
+                    "isPartOfComposite": true
                 }
             ]
         },

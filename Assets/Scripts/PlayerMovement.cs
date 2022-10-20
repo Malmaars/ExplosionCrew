@@ -74,9 +74,9 @@ public class PlayerMovement : MonoBehaviour
         fire.performed += FireOnTarget;
 
 
-        attack = playerControls.Player.Attack;
-        attack.Enable();
-        attack.performed += MovementBurst;
+        //attack = playerControls.Player.Attack;
+        //attack.Enable();
+        //attack.performed += MovementBurst;
 
         jump = playerControls.Player.Jump;
         jump.Enable();
@@ -215,7 +215,7 @@ public class PlayerMovement : MonoBehaviour
         if (IsGrounded())
         {
             Debug.Log("jump");
-            rb.AddForce(Vector3.up * jumpSpeed, ForceMode.Impulse);
+            //rb.AddForce(Vector3.up * jumpSpeed, ForceMode.Impulse);
             playerAnimator.SetTrigger("Jump");
         }
 
@@ -226,7 +226,7 @@ public class PlayerMovement : MonoBehaviour
             airBoostCount--;
             airBoostParticles.Play();
 
-            rb.AddForce(Vector3.up * jumpSpeed, ForceMode.Impulse);
+            //rb.AddForce(Vector3.up * jumpSpeed, ForceMode.Impulse);
             playerAnimator.SetTrigger("Jump");
         }
     }
