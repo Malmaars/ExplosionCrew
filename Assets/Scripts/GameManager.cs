@@ -8,12 +8,16 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         //initialize out perfomance debuffs
+        QualitySettings.vSyncCount = 0;
         Application.targetFrameRate = 30;
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Application.Quit();
+        }
     }
 }

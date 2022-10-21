@@ -31,9 +31,12 @@ public class PlayerV2 : MonoBehaviour
     public LayerMask ignoreMe;
     Rigidbody rb;
 
+    [Header("Combat")]
+    public GameObject punchHitBox;
+
     [Header ("Input")]
     PlayerInputActions playerControls;
-    InputAction move, fire, jump, aim, focus, boost;
+    InputAction move, fire, jump, aim, focus, boost, attack;
     // Start is called before the first frame update
     void Awake()
     {
@@ -65,7 +68,12 @@ public class PlayerV2 : MonoBehaviour
 
         boost = playerControls.Player.Boost;
         boost.Enable();
-        boost.performed += BoostToDirection;
+        boost.performed += BoostForward;
+
+        attack = playerControls.Player.Attack;
+        attack.Enable();
+        attack.performed += Punch;
+        //boost.performed += BoostToDirection;
     }
 
     private void OnDisable()
@@ -83,7 +91,7 @@ public class PlayerV2 : MonoBehaviour
     {
         Move();
         if (IsGrounded())
-        {
+        { 
             airBoostCount = airBoostAmount;
             //pop the player up if they are INSIDE the ground
             RaycastHit groundHit;
@@ -161,7 +169,7 @@ public class PlayerV2 : MonoBehaviour
         }
 
         transform.position += new Vector3(0, jumpVelocity * Time.deltaTime, 0);
-        rb.velocity += boostVelocity * Time.deltaTime;
+        rb.velocity += boostVelocity;
 
 
         //transform.position += new Vector3(0, jumpVelocity * Time.deltaTime, 0);
@@ -169,6 +177,11 @@ public class PlayerV2 : MonoBehaviour
 
         Debug.Log(playerWidth);
         //CheckCollission();
+    }
+
+    private void FixedUpdate()
+    {
+        
     }
 
     void Move()
@@ -180,8 +193,8 @@ public class PlayerV2 : MonoBehaviour
 
         //change the placement of the values for 3d use.
 
-        float Horizontal = moveDirection.x * movementSpeed * Time.deltaTime;
-        float Vertical = moveDirection.y * movementSpeed * Time.deltaTime;
+        float Horizontal = moveDirection.x * movementSpeed;
+        float Vertical = moveDirection.y * movementSpeed;
 
 
         //move based on the camera view.
@@ -201,7 +214,11 @@ public class PlayerV2 : MonoBehaviour
         //Debug.Log(movement);
 
 
-        rb.velocity += movement * movementSpeed;
+        //shoot out a raycast to the wanted location, if it hits a wall, stop moving.
+        if(!Physics.Raycast(transform.position, movement.normalized, playerWidth + 0.5f))
+        {
+            rb.velocity += movement * movementSpeed;
+        }
         //Debug.Log(movementSpeed);
     }
 
@@ -272,6 +289,32 @@ public class PlayerV2 : MonoBehaviour
         }
     }
 
+    void BoostForward(InputAction.CallbackContext context)
+    {
+        if (airBoostCount > 0)
+        {
+            airBoostCount--;
+            Vector3 boostDirection = transform.forward * boostSpeed;
+            particleForward.Play();
+            boostVelocity = boostDirection;
+            boostVelocityX = boostDirection.x;
+            boostVelocityZ = boostDirection.z;
+        }
+    }
+
+    void Punch(InputAction.CallbackContext context)
+    {
+        Vector3 boostDirection = -transform.forward * boostSpeed;
+        particleBackward.Play();
+        boostVelocity = boostDirection;
+        boostVelocityX = boostDirection.x;
+        boostVelocityZ = boostDirection.z;
+
+        //create hitbox in front of the player, which hits enemies, and perhaps leaves marks on walls or objects in front of you
+        punchHitBox.SetActive(true);
+        StartCoroutine(DisablePunch());
+    }
+
     void CheckCollission()
     {
         //send out raycast in a couple directions and move the player if it collides with something;
@@ -295,5 +338,11 @@ public class PlayerV2 : MonoBehaviour
                 Debug.DrawRay(transform.position, new Vector3(i, 0, k).normalized * playerWidth, Color.green);
             }
         }
+    }
+
+    IEnumerator DisablePunch()
+    {
+        yield return new WaitForSeconds(0.1f);
+        punchHitBox.SetActive(false);
     }
 }
