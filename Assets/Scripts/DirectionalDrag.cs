@@ -13,7 +13,7 @@ public class DirectionalDrag : MonoBehaviour
         rb = GetComponent<Rigidbody>();
     }
 
-    void Update()
+    void FixedUpdate()
     {
         Vector3 vel = transform.InverseTransformDirection(rb.velocity);
         vel.x *= x;

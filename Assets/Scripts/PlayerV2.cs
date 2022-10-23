@@ -2,26 +2,40 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Cinemachine;
 
 public class PlayerV2 : MonoBehaviour
 {
+    public CinemachineVirtualCamera playerCam;
+
     [Header("Air Boost")]
     public int airBoostAmount;
     int airBoostCount;
     public float boostSpeed;
+    float baseBoostSpeed;
+    public float maxBoostSpeed;
     public float boostDrag;
+    public float boostChargeSpeed;
+    bool isChargingBoost;
+    float baseBoostDrag;
     Vector3 boostVelocity;
     float boostVelocityX;
     float boostVelocityZ;
     public ParticleSystem particleJump, particleLeft, particleRight, particleForward, particleBackward;
+    public Transform EnergyVisual;
 
     [Header("Base Movement Variables")]
     public float maxMovementSpeed;
     public float movementSpeed;
     public float jumpSpeed;
+    float baseJumpSpeed;
+    public float maxJumpSpeed;
+    bool isChargingJump;
+    public float chargeSpeed;
     public float jumpDrag;
     float jumpVelocity;
     float minMaxMoveSpeed;
+    Vector3 nextLocation;
 
     [Header ("Simple Physics")]
     float distToGround;
@@ -33,6 +47,8 @@ public class PlayerV2 : MonoBehaviour
 
     [Header("Combat")]
     public GameObject punchHitBox;
+    public GameObject jumpHitBox;
+    public GameObject backHitBox;
 
     [Header ("Input")]
     PlayerInputActions playerControls;
@@ -46,6 +62,9 @@ public class PlayerV2 : MonoBehaviour
         distToGround = playerCollider.bounds.extents.y;
         playerWidth = playerCollider.radius;
         playerControls = new PlayerInputActions();
+        baseBoostDrag = boostDrag;
+        baseJumpSpeed = jumpSpeed;
+        baseBoostSpeed = boostSpeed;
     }
 
     private void OnEnable()
@@ -59,6 +78,7 @@ public class PlayerV2 : MonoBehaviour
         jump = playerControls.Player.Jump;
         jump.Enable();
         jump.performed += Jump;
+        //jump.canceled += Jump;
 
         aim = playerControls.Player.Aim;
         aim.Enable();
@@ -69,6 +89,7 @@ public class PlayerV2 : MonoBehaviour
         boost = playerControls.Player.Boost;
         boost.Enable();
         boost.performed += BoostForward;
+        //boost.canceled += BoostForward;
 
         attack = playerControls.Player.Attack;
         attack.Enable();
@@ -87,11 +108,11 @@ public class PlayerV2 : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         Move();
         if (IsGrounded())
-        { 
+        {
             airBoostCount = airBoostAmount;
             //pop the player up if they are INSIDE the ground
             RaycastHit groundHit;
@@ -105,8 +126,6 @@ public class PlayerV2 : MonoBehaviour
             {
                 jumpVelocity = 0;
             }
-
-            movementSpeed = minMaxMoveSpeed;
         }
 
         if (!IsGrounded())
@@ -121,14 +140,14 @@ public class PlayerV2 : MonoBehaviour
             {
                 jumpVelocity = 0;
             }
-            movementSpeed = minMaxMoveSpeed / 1.5f;
+            //movementSpeed = minMaxMoveSpeed / 1.5f;
         }
 
         if(boostVelocity != Vector3.zero)
         {
             if(boostVelocityX < 0)
             {
-                boostVelocity = new Vector3(boostVelocity.x + Time.deltaTime * boostDrag, 0, boostVelocity.z);
+                boostVelocity = new Vector3(boostVelocity.x - boostVelocity.x * boostDrag, 0, boostVelocity.z);
 
 
                 if (boostVelocity.x > -0.1f)
@@ -139,7 +158,7 @@ public class PlayerV2 : MonoBehaviour
 
             else if(boostVelocityX > 0)
             {
-                boostVelocity = new Vector3(boostVelocity.x - Time.deltaTime * boostDrag, 0, boostVelocity.z);
+                boostVelocity = new Vector3(boostVelocity.x - boostVelocity.x * boostDrag, 0, boostVelocity.z);
 
                 if (boostVelocity.x < 0.1f)
                 {
@@ -149,7 +168,7 @@ public class PlayerV2 : MonoBehaviour
 
             if(boostVelocityZ < 0)
             {
-                boostVelocity = new Vector3(boostVelocity.x, 0, boostVelocity.z + Time.deltaTime * boostDrag);
+                boostVelocity = new Vector3(boostVelocity.x, 0, boostVelocity.z - boostVelocity.z * boostDrag);
 
                 if (boostVelocity.z > -0.1f)
                 {
@@ -159,7 +178,7 @@ public class PlayerV2 : MonoBehaviour
 
             else if (boostVelocityZ > 0)
             {
-                boostVelocity = new Vector3(boostVelocity.x, 0, boostVelocity.z - Time.deltaTime * boostDrag);
+                boostVelocity = new Vector3(boostVelocity.x, 0, boostVelocity.z - boostVelocity.z * boostDrag);
 
                 if (boostVelocity.z < 0.1f)
                 {
@@ -168,19 +187,42 @@ public class PlayerV2 : MonoBehaviour
             }
         }
 
-        transform.position += new Vector3(0, jumpVelocity * Time.deltaTime, 0);
-        rb.velocity += boostVelocity;
+        //transform.position += new Vector3(0, jumpVelocity * Time.deltaTime, 0);
+        //rb.velocity += boostVelocity;
 
 
         //transform.position += new Vector3(0, jumpVelocity * Time.deltaTime, 0);
         //transform.position += boostVelocity * Time.deltaTime;
 
-        Debug.Log(playerWidth);
         //CheckCollission();
-    }
 
-    private void FixedUpdate()
-    {
+        if (isChargingJump)
+        {
+            if (jumpSpeed < maxJumpSpeed)
+                jumpSpeed += Time.deltaTime * chargeSpeed;
+
+            else if (jumpSpeed > maxJumpSpeed)
+                jumpSpeed = maxJumpSpeed;
+
+            EnergyVisual.localScale = new Vector3(1, 0.1f + 0.9f / (maxJumpSpeed - baseJumpSpeed) * (jumpSpeed - baseJumpSpeed), 1);
+        }
+
+        if (isChargingBoost)
+        {
+            if (boostSpeed < maxBoostSpeed)
+                boostSpeed += Time.deltaTime * boostChargeSpeed;
+
+            else if (boostSpeed > maxBoostSpeed)
+                boostSpeed = maxBoostSpeed;
+
+            EnergyVisual.localScale = new Vector3(1, 0.1f + 0.9f / (maxBoostSpeed - baseBoostSpeed) * (boostSpeed - baseBoostSpeed), 1);
+        }
+
+        rb.velocity += nextLocation;
+        nextLocation = Vector3.zero;
+
+        rb.AddForce(Physics.gravity * 4, ForceMode.Acceleration);
+        rb.AddForce(boostVelocity, ForceMode.Acceleration);
         
     }
 
@@ -215,9 +257,9 @@ public class PlayerV2 : MonoBehaviour
 
 
         //shoot out a raycast to the wanted location, if it hits a wall, stop moving.
-        if(!Physics.Raycast(transform.position, movement.normalized, playerWidth + 0.5f))
+        if(!Physics.Raycast(transform.position - Vector3.up * distToGround, movement.normalized, playerWidth + 0.5f) && !Physics.Raycast(transform.position + Vector3.up * distToGround, movement.normalized, playerWidth + 0.5f))
         {
-            rb.velocity += movement * movementSpeed;
+            nextLocation += movement * movementSpeed;
         }
         //Debug.Log(movementSpeed);
     }
@@ -227,10 +269,24 @@ public class PlayerV2 : MonoBehaviour
         return Physics.Raycast(transform.position, -Vector3.up, distToGround);
     }
 
+    void ChargeJump(InputAction.CallbackContext context)
+    {
+        jumpSpeed = baseJumpSpeed;
+        isChargingJump = true; 
+    }
+
     void Jump(InputAction.CallbackContext context)
     {
+        isChargingJump = false;
+        EnergyVisual.localScale = new Vector3(1, 0.1f, 1);
         if (IsGrounded())
-            jumpVelocity = jumpSpeed;
+        {
+            //jumpVelocity = jumpSpeed;
+
+            rb.AddForce(Vector3.up * jumpSpeed, ForceMode.Impulse);
+            //boostDrag = baseBoostDrag / 2;
+        }
+            
 
         //When we get input when the player isn't grounded
         //double jump if there's boost count to do so
@@ -239,8 +295,14 @@ public class PlayerV2 : MonoBehaviour
             airBoostCount--;
             particleJump.Play();
 
-            jumpVelocity = jumpSpeed;
+            rb.AddForce(Vector3.up * jumpSpeed, ForceMode.Impulse);
+            //jumpVelocity = jumpSpeed;
             rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
+
+            //boostDrag = baseBoostDrag / 2;
+
+            jumpHitBox.SetActive(true);
+            StartCoroutine(DisablePunch(jumpHitBox));
         }
     }
 
@@ -289,30 +351,50 @@ public class PlayerV2 : MonoBehaviour
         }
     }
 
+    void ChargeBoost(InputAction.CallbackContext context)
+    {
+        boostSpeed = baseBoostSpeed;
+        isChargingBoost = true;
+    }
+
     void BoostForward(InputAction.CallbackContext context)
     {
+        EnergyVisual.localScale = new Vector3(1, 0.1f, 1);
+        isChargingBoost = false;
         if (airBoostCount > 0)
         {
+            //boostDrag = baseBoostDrag;
             airBoostCount--;
             Vector3 boostDirection = transform.forward * boostSpeed;
             particleForward.Play();
             boostVelocity = boostDirection;
-            boostVelocityX = boostDirection.x;
-            boostVelocityZ = boostDirection.z;
+            boostVelocityX = boostDirection.normalized.x;
+            boostVelocityZ = boostDirection.normalized.z;
+
+            //rb.AddForce(boostDirection, ForceMode.Impulse);
+
+            backHitBox.SetActive(true);
+            StartCoroutine(DisablePunch(backHitBox));
         }
     }
 
     void Punch(InputAction.CallbackContext context)
     {
-        Vector3 boostDirection = -transform.forward * boostSpeed;
-        particleBackward.Play();
-        boostVelocity = boostDirection;
-        boostVelocityX = boostDirection.x;
-        boostVelocityZ = boostDirection.z;
+        if (airBoostCount > 0)
+        {
+            //boostDrag = baseBoostDrag;
+            Vector3 boostDirection = -transform.forward * boostSpeed;
+            particleBackward.Play();
+            boostVelocity = boostDirection;
+            boostVelocityX = boostDirection.normalized.x;
+            boostVelocityZ = boostDirection.normalized.z;
 
-        //create hitbox in front of the player, which hits enemies, and perhaps leaves marks on walls or objects in front of you
-        punchHitBox.SetActive(true);
-        StartCoroutine(DisablePunch());
+            //rb.AddForce(boostDirection, ForceMode.Impulse);
+
+            //create hitbox in front of the player, which hits enemies, and perhaps leaves marks on walls or objects in front of you
+            punchHitBox.SetActive(true);
+            StartCoroutine(DisablePunch(punchHitBox));
+        }
     }
 
     void CheckCollission()
@@ -340,9 +422,27 @@ public class PlayerV2 : MonoBehaviour
         }
     }
 
-    IEnumerator DisablePunch()
+    void SnapMoveCamera()
+    {
+        //find direction and distance the camera is from the player, then edit the direction, and put the camera at the distance
+        //^disable virtual camera                                                                                               ^enable virtual camera
+
+        Transform cameraTransform = playerCam.transform;
+
+        playerCam.enabled = false;
+
+        Vector3 directionFromPlayer = transform.position - cameraTransform.position;
+        float distanceFromPlayer = Vector3.Distance(transform.position, cameraTransform.position);
+        
+        //move transform
+
+
+        playerCam.enabled = true;
+    }
+
+    IEnumerator DisablePunch(GameObject toDisable)
     {
         yield return new WaitForSeconds(0.1f);
-        punchHitBox.SetActive(false);
+        toDisable.SetActive(false);
     }
 }
