@@ -6,11 +6,18 @@ using Cinemachine;
 
 public class PlayerV2 : MonoBehaviour
 {
-    public CinemachineVirtualCamera playerCam;
+    [Header("Taking Damage and such")]
+    public int playerHealth;
+    public float knockback;
+    Vector3 forceBackVelocity;
+    public float forceBackDrag;
+    bool stunLock;
+    public ParticleSystem DamageEffect;
+
 
     [Header("Air Boost")]
     public int airBoostAmount;
-    int airBoostCount;
+    public int airBoostCount;
     public float boostSpeed;
     float baseBoostSpeed;
     public float maxBoostSpeed;
@@ -23,17 +30,21 @@ public class PlayerV2 : MonoBehaviour
     float boostVelocityZ;
     public ParticleSystem particleJump, particleLeft, particleRight, particleForward, particleBackward;
     public Transform EnergyVisual;
+    public float rechargeSpeed;
+    float baseRechargeSpeed;
 
     [Header("Base Movement Variables")]
+    public Animator playerAnimator;
     public float maxMovementSpeed;
     public float movementSpeed;
+    public float airMovementSpeed;
     public float jumpSpeed;
     float baseJumpSpeed;
     public float maxJumpSpeed;
     bool isChargingJump;
     public float chargeSpeed;
     public float jumpDrag;
-    float jumpVelocity;
+    Vector3 jumpVelocity;
     float minMaxMoveSpeed;
     Vector3 nextLocation;
 
@@ -52,7 +63,15 @@ public class PlayerV2 : MonoBehaviour
 
     [Header ("Input")]
     PlayerInputActions playerControls;
-    InputAction move, fire, jump, aim, focus, boost, attack;
+    InputAction move, fire, jump, aim, focus, boost, attack, cameraTurn;
+
+    [Header("Camera")]
+    public Transform cameraFollow;
+    Vector3 newCameraPosition;
+    public CinemachineVirtualCamera playerCam;
+    public float cameraTurnSpeed;
+    bool movingCamera;
+    public bool invertedCameraControls;
     // Start is called before the first frame update
     void Awake()
     {
@@ -65,6 +84,7 @@ public class PlayerV2 : MonoBehaviour
         baseBoostDrag = boostDrag;
         baseJumpSpeed = jumpSpeed;
         baseBoostSpeed = boostSpeed;
+        baseRechargeSpeed = rechargeSpeed;
     }
 
     private void OnEnable()
@@ -94,6 +114,10 @@ public class PlayerV2 : MonoBehaviour
         attack = playerControls.Player.Attack;
         attack.Enable();
         attack.performed += Punch;
+
+        cameraTurn = playerControls.Player.DPad;
+        cameraTurn.Enable();
+        cameraTurn.performed += MoveCamera;
         //boost.performed += BoostToDirection;
     }
 
@@ -101,49 +125,71 @@ public class PlayerV2 : MonoBehaviour
     {
         move.Disable();
         jump.Disable();
+        jump.performed -= Jump;
         aim.Disable();
         fire.Disable();
         focus.Disable();
         boost.Disable();
+        boost.performed -= BoostForward;
+        attack.Disable();
+        attack.performed -= Punch;
+        cameraTurn.Disable();
+        cameraTurn.performed -= MoveCamera;
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
-        Move();
+        Debug.Log(IsGrounded());
+
+        playerAnimator.SetBool("Grounded", IsGrounded());
+        if (!movingCamera)
+            Move();
+
+        //if (airBoostCount < airBoostAmount)
+        //{
+        //    rechargeSpeed -= Time.fixedDeltaTime;
+
+        //    if (rechargeSpeed < 0)
+        //    {
+        //        airBoostCount++;
+        //        rechargeSpeed = baseRechargeSpeed;
+        //    }
+        //}
+
         if (IsGrounded())
-        {
+        { 
             airBoostCount = airBoostAmount;
+
             //pop the player up if they are INSIDE the ground
             RaycastHit groundHit;
             Physics.Raycast(transform.position, -Vector3.up, out groundHit);
+
             //if (groundHit.distance < distToGround)
             //{
             //    transform.position += new Vector3(0, distToGround - groundHit.distance, 0);
             //}
 
-            if (jumpVelocity != jumpSpeed)
-            {
-                jumpVelocity = 0;
-            }
+
         }
 
         if (!IsGrounded())
         {
-            transform.position += new Vector3(0, gravity * Time.deltaTime, 0);
+            transform.position += new Vector3(0, gravity * Time.fixedDeltaTime, 0);
 
-            if (jumpVelocity > 0)
-            {
-                jumpVelocity -= Time.deltaTime * jumpDrag;
-            }
-            if(jumpVelocity < 0)
-            {
-                jumpVelocity = 0;
-            }
             //movementSpeed = minMaxMoveSpeed / 1.5f;
         }
 
-        if(boostVelocity != Vector3.zero)
+        if (jumpVelocity.y > 0)
+        {
+            jumpVelocity = new Vector3(0, jumpVelocity.y - jumpVelocity.y * jumpDrag, 0);
+        }
+        else if (jumpVelocity.y < 0)
+        {
+            jumpVelocity = Vector3.zero;
+        }
+
+        if (boostVelocity != Vector3.zero)
         {
             if(boostVelocityX < 0)
             {
@@ -187,6 +233,17 @@ public class PlayerV2 : MonoBehaviour
             }
         }
 
+        if(forceBackVelocity != Vector3.zero)
+        {
+            forceBackVelocity -= forceBackVelocity * forceBackDrag;
+            forceBackVelocity = new Vector3(forceBackVelocity.x, forceBackVelocity.y * 0.5f, forceBackVelocity.z);
+
+            if(forceBackVelocity.magnitude < 0.1f)
+            {
+                forceBackVelocity = Vector3.zero;
+            }
+        }
+
         //transform.position += new Vector3(0, jumpVelocity * Time.deltaTime, 0);
         //rb.velocity += boostVelocity;
 
@@ -218,12 +275,28 @@ public class PlayerV2 : MonoBehaviour
             EnergyVisual.localScale = new Vector3(1, 0.1f + 0.9f / (maxBoostSpeed - baseBoostSpeed) * (boostSpeed - baseBoostSpeed), 1);
         }
 
+        if (movingCamera)
+        {
+            //playerCam.ForceCameraPosition(Vector3.Lerp(playerCam.transform.position, newCameraPosition, cameraTurnSpeed), Quaternion.Euler(transform.position - playerCam.transform.position));
+            cameraFollow.position = Vector3.Lerp(cameraFollow.position, newCameraPosition, cameraTurnSpeed);
+            if (Vector3.Distance(playerCam.transform.position, newCameraPosition) < 0.1f)
+            {
+                movingCamera = false;
+                playerCam.Follow = transform;
+                playerCam.GetCinemachineComponent<CinemachineTransposer>().m_FollowOffset = new Vector3(0, 6, -20);
+                //playerCam.GetCinemachineComponent<CinemachineTransposer>().m_YDamping = 0.1f;
+                //playerCam.GetCinemachineComponent<CinemachineTransposer>().m_ZDamping = 1;
+            }
+        }
+
         rb.velocity += nextLocation;
         nextLocation = Vector3.zero;
 
         rb.AddForce(Physics.gravity * 4, ForceMode.Acceleration);
         rb.AddForce(boostVelocity, ForceMode.Acceleration);
-        
+        rb.AddForce(jumpVelocity, ForceMode.Acceleration);
+        rb.AddForce(forceBackVelocity, ForceMode.Acceleration);
+
     }
 
     void Move()
@@ -256,17 +329,34 @@ public class PlayerV2 : MonoBehaviour
         //Debug.Log(movement);
 
 
-        //shoot out a raycast to the wanted location, if it hits a wall, stop moving.
-        if(!Physics.Raycast(transform.position - Vector3.up * distToGround, movement.normalized, playerWidth + 0.5f) && !Physics.Raycast(transform.position + Vector3.up * distToGround, movement.normalized, playerWidth + 0.5f))
+        if (moveDirection == Vector2.zero)
         {
-            nextLocation += movement * movementSpeed;
+            playerAnimator.SetBool("Running", false);
+        }
+        else
+        {
+            playerAnimator.SetBool("Running", true);
+        }
+
+        //shoot out a raycast to the wanted location, if it hits a wall, stop moving.
+        if (!Physics.Raycast(transform.position - Vector3.up * distToGround / 2, movement.normalized, playerWidth + 0.5f) && !Physics.Raycast(transform.position + Vector3.up * distToGround / 2, movement.normalized, playerWidth + 0.5f))
+        {
+            if (IsGrounded())
+            {
+                nextLocation += movement * movementSpeed;
+            }
+
+            else
+            {
+                nextLocation += movement * airMovementSpeed;
+            }
         }
         //Debug.Log(movementSpeed);
     }
 
     bool IsGrounded()
     {
-        return Physics.Raycast(transform.position, -Vector3.up, distToGround);
+        return Physics.Raycast(transform.position, -Vector3.up, distToGround + 0.1f);
     }
 
     void ChargeJump(InputAction.CallbackContext context)
@@ -277,13 +367,15 @@ public class PlayerV2 : MonoBehaviour
 
     void Jump(InputAction.CallbackContext context)
     {
+        Debug.Log("jump");
         isChargingJump = false;
         EnergyVisual.localScale = new Vector3(1, 0.1f, 1);
         if (IsGrounded())
         {
-            //jumpVelocity = jumpSpeed;
+            playerAnimator.SetTrigger("Jump");
+            jumpVelocity = Vector3.up * jumpSpeed;
 
-            rb.AddForce(Vector3.up * jumpSpeed, ForceMode.Impulse);
+            //rb.AddForce(Vector3.up * jumpSpeed, ForceMode.Impulse);
             //boostDrag = baseBoostDrag / 2;
         }
             
@@ -292,10 +384,13 @@ public class PlayerV2 : MonoBehaviour
         //double jump if there's boost count to do so
         if (!IsGrounded() && airBoostCount > 0)
         {
+            playerAnimator.SetTrigger("BoostUp");
+            rechargeSpeed = baseRechargeSpeed;
             airBoostCount--;
             particleJump.Play();
 
-            rb.AddForce(Vector3.up * jumpSpeed, ForceMode.Impulse);
+            jumpVelocity = Vector3.up * jumpSpeed;
+            //rb.AddForce(Vector3.up * jumpSpeed, ForceMode.Impulse);
             //jumpVelocity = jumpSpeed;
             rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
 
@@ -365,6 +460,7 @@ public class PlayerV2 : MonoBehaviour
         {
             //boostDrag = baseBoostDrag;
             airBoostCount--;
+            rechargeSpeed = baseRechargeSpeed;
             Vector3 boostDirection = transform.forward * boostSpeed;
             particleForward.Play();
             boostVelocity = boostDirection;
@@ -372,6 +468,7 @@ public class PlayerV2 : MonoBehaviour
             boostVelocityZ = boostDirection.normalized.z;
 
             //rb.AddForce(boostDirection, ForceMode.Impulse);
+            playerAnimator.SetTrigger("BoostForward");
 
             backHitBox.SetActive(true);
             StartCoroutine(DisablePunch(backHitBox));
@@ -384,17 +481,68 @@ public class PlayerV2 : MonoBehaviour
         {
             //boostDrag = baseBoostDrag;
             Vector3 boostDirection = -transform.forward * boostSpeed;
+            rechargeSpeed = baseRechargeSpeed;
             particleBackward.Play();
             boostVelocity = boostDirection;
             boostVelocityX = boostDirection.normalized.x;
             boostVelocityZ = boostDirection.normalized.z;
 
             //rb.AddForce(boostDirection, ForceMode.Impulse);
+            playerAnimator.SetTrigger("BoostBackward");
 
             //create hitbox in front of the player, which hits enemies, and perhaps leaves marks on walls or objects in front of you
             punchHitBox.SetActive(true);
             StartCoroutine(DisablePunch(punchHitBox));
         }
+    }
+
+    void MoveCamera(InputAction.CallbackContext context)
+    {
+        float distanceFromPlayer = Vector3.Distance(playerCam.transform.position, transform.position);
+        Vector3 directionFromPlayer = (playerCam.transform.position - transform.position).normalized;
+        Vector2 perpVector = Vector2.Perpendicular(new Vector2(directionFromPlayer.x, directionFromPlayer.z));
+
+        Vector2 cameraTurnDirection = cameraTurn.ReadValue<Vector2>();
+
+        if (movingCamera || cameraTurnDirection.x == 0)
+            return;
+
+        if (!invertedCameraControls)
+        {
+            if (cameraTurnDirection.x > 0)
+            {
+                newCameraPosition = new Vector3(transform.position.x - perpVector.x * distanceFromPlayer, playerCam.transform.position.y, transform.position.z - perpVector.y * distanceFromPlayer);
+            }
+
+            if (cameraTurnDirection.x < 0)
+            {
+                newCameraPosition = new Vector3(transform.position.x + perpVector.x * distanceFromPlayer, playerCam.transform.position.y, transform.position.z + perpVector.y * distanceFromPlayer);
+            }
+        }
+
+        if (invertedCameraControls)
+        {
+            if (cameraTurnDirection.x < 0)
+            {
+                newCameraPosition = new Vector3(transform.position.x - perpVector.x * distanceFromPlayer, playerCam.transform.position.y, transform.position.z - perpVector.y * distanceFromPlayer);
+            }
+
+            if (cameraTurnDirection.x > 0)
+            {
+                newCameraPosition = new Vector3(transform.position.x + perpVector.x * distanceFromPlayer, playerCam.transform.position.y, transform.position.z + perpVector.y * distanceFromPlayer);
+            }
+        }
+
+
+        cameraFollow.position = playerCam.transform.position;
+        playerCam.Follow = cameraFollow;
+
+        playerCam.GetCinemachineComponent<CinemachineTransposer>().m_FollowOffset = new Vector3(0, 0, 0);
+        playerCam.GetCinemachineComponent<CinemachineTransposer>().m_YDamping = 0;
+        playerCam.GetCinemachineComponent<CinemachineTransposer>().m_ZDamping = 0;
+
+        //playerCam.GetCinemachineComponent<CinemachineVirtualCamera>().
+        movingCamera = true;
     }
 
     void CheckCollission()
@@ -422,22 +570,21 @@ public class PlayerV2 : MonoBehaviour
         }
     }
 
-    void SnapMoveCamera()
+    public void TakeDamage(int AmountOfDamage, Vector3 pointOfCollision)
     {
-        //find direction and distance the camera is from the player, then edit the direction, and put the camera at the distance
-        //^disable virtual camera                                                                                               ^enable virtual camera
+        playerHealth -= AmountOfDamage;
 
-        Transform cameraTransform = playerCam.transform;
+        rb.velocity = Vector3.zero;
+        Vector3 forceBackDirection = (transform.position - pointOfCollision).normalized;
+        forceBackDirection = new Vector3(forceBackDirection.x, 0.5f, forceBackDirection.z);
+        Debug.Log(forceBackDirection);
+        forceBackVelocity = forceBackDirection.normalized * knockback;
+        Debug.Log("TAKE DAMAGE");
 
-        playerCam.enabled = false;
-
-        Vector3 directionFromPlayer = transform.position - cameraTransform.position;
-        float distanceFromPlayer = Vector3.Distance(transform.position, cameraTransform.position);
-        
-        //move transform
-
-
-        playerCam.enabled = true;
+        DamageEffect.transform.position = pointOfCollision;
+        DamageEffect.transform.forward = (transform.position - pointOfCollision).normalized;
+        DamageEffect.Play();
+        //trigger damage animation maybe
     }
 
     IEnumerator DisablePunch(GameObject toDisable)
