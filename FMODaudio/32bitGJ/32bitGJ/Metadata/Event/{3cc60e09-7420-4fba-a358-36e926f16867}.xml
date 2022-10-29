@@ -2,7 +2,7 @@
 <objects serializationModel="Studio.02.02.00">
 	<object class="Event" id="{3cc60e09-7420-4fba-a358-36e926f16867}">
 		<property name="name">
-			<value>Coin</value>
+			<value>Select</value>
 		</property>
 		<property name="outputFormat">
 			<value>1</value>
@@ -90,7 +90,7 @@
 	<object class="MixerBusPanner" id="{b4d13a89-8cce-45e7-b51e-db7091e1c5c7}" />
 	<object class="SingleSound" id="{8e7f2096-e92e-4923-9a36-10612a4fc4a4}">
 		<property name="length">
-			<value>0.28999999999999998</value>
+			<value>0.315</value>
 		</property>
 		<relationship name="audioFile">
 			<destination>{db670750-4ee2-44aa-953a-a9335533f0be}</destination>
