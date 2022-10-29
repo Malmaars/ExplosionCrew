@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.02.00">
+	<object class="AudioFile" id="{30b67a38-ac14-4ebb-a771-61ff1fdd3526}">
+		<property name="assetPath">
+			<value>BANK_00_INSTR_0082_SND_0000.1.wav</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>44.0999985</value>
+		</property>
+		<property name="channelCount">
+			<value>1</value>
+		</property>
+		<property name="length">
+			<value>0.48904761904761906</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{db19c33f-ed9c-4c8d-a7e9-d9a3791bae34}</destination>
+		</relationship>
+	</object>
+</objects>
