@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.02.00">
+	<object class="EffectPreset" id="{9e54a2a9-7508-4ed6-918e-fde115117de4}">
+		<property name="name">
+			<value>Reverb Send</value>
+		</property>
+		<relationship name="folder">
+			<destination>{d80e10e3-49ba-47f6-b58a-96b97877676f}</destination>
+		</relationship>
+		<relationship name="effect">
+			<destination>{bf787524-4ca2-4e01-b6d1-33d1c969e735}</destination>
+		</relationship>
+	</object>
+	<object class="MixerSend" id="{bf787524-4ca2-4e01-b6d1-33d1c969e735}">
+		<property name="inputFormat">
+			<value>2</value>
+		</property>
+		<relationship name="mixerReturn">
+			<destination>{3da8c507-d94c-4792-a830-6927b54bf871}</destination>
+		</relationship>
+	</object>
+</objects>

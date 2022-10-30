@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.02.00">
+	<object class="ParameterPresetFolder" id="{147d8bef-d7d4-4f91-8c13-96528d08d958}">
+		<property name="name">
+			<value>Interactables</value>
+		</property>
+		<relationship name="folder">
+			<destination>{f1cffbc2-a7c5-445b-91ac-34bf7139e7b1}</destination>
+		</relationship>
+	</object>
+</objects>

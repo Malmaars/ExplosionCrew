@@ -4,5 +4,61 @@
 		<property name="name">
 			<value>Master</value>
 		</property>
+		<relationship name="items">
+			<destination>{07df9a4f-af70-45dc-85bf-a04e133b83f7}</destination>
+			<destination>{959b2fe7-326e-4402-ab7e-199e2fcdb8cb}</destination>
+			<destination>{edef7d4f-ba39-4319-bd75-e76e695a59e4}</destination>
+			<destination>{5a4333b1-8d55-4427-93a6-3c517e711ab4}</destination>
+			<destination>{98a2dbe7-d1dd-4c2d-ad8d-52ecf158160c}</destination>
+			<destination>{32922db0-6ca0-42d7-8e39-2693e399fb19}</destination>
+			<destination>{228494ed-2ee7-4af0-a97f-ff4ec1d43b4c}</destination>
+			<destination>{4eb9e4c3-653f-4939-9959-28375e159b50}</destination>
+			<destination>{902ecc93-4178-4f68-ac48-99daf480f302}</destination>
+		</relationship>
+	</object>
+	<object class="Tag" id="{07df9a4f-af70-45dc-85bf-a04e133b83f7}">
+		<property name="name">
+			<value>async</value>
+		</property>
+	</object>
+	<object class="Tag" id="{959b2fe7-326e-4402-ab7e-199e2fcdb8cb}">
+		<property name="name">
+			<value>automation</value>
+		</property>
+	</object>
+	<object class="Tag" id="{edef7d4f-ba39-4319-bd75-e76e695a59e4}">
+		<property name="name">
+			<value>fade</value>
+		</property>
+	</object>
+	<object class="Tag" id="{5a4333b1-8d55-4427-93a6-3c517e711ab4}">
+		<property name="name">
+			<value>loop-instrument</value>
+		</property>
+	</object>
+	<object class="Tag" id="{98a2dbe7-d1dd-4c2d-ad8d-52ecf158160c}">
+		<property name="name">
+			<value>parameter</value>
+		</property>
+	</object>
+	<object class="Tag" id="{32922db0-6ca0-42d7-8e39-2693e399fb19}">
+		<property name="name">
+			<value>persistent</value>
+		</property>
+	</object>
+	<object class="Tag" id="{228494ed-2ee7-4af0-a97f-ff4ec1d43b4c}">
+		<property name="name">
+			<value>send</value>
+		</property>
+	</object>
+	<object class="Tag" id="{4eb9e4c3-653f-4939-9959-28375e159b50}">
+		<property name="name">
+			<value>single-instrument</value>
+		</property>
+	</object>
+	<object class="Tag" id="{902ecc93-4178-4f68-ac48-99daf480f302}">
+		<property name="name">
+			<value>start-offset</value>
+		</property>
 	</object>
 </objects>
