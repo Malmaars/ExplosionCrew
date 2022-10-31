@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <objects serializationModel="Studio.02.02.00">
 	<object class="Event" id="{4396a288-6a28-4b68-a419-5ad0f7fb699d}">
+		<property name="color">
+			<value>Red</value>
+		</property>
 		<property name="name">
 			<value>Enemydeath2</value>
 		</property>
 		<property name="outputFormat">
-			<value>2</value>
+			<value>1</value>
 		</property>
 		<relationship name="folder">
 			<destination>{71b8f2ac-198d-4084-8e5c-73ab266fd518}</destination>
@@ -119,12 +122,10 @@
 	<object class="MixerBusFader" id="{3eb651e1-7d2a-4a0c-94d9-d60923731c11}" />
 	<object class="MixerBusEffectChain" id="{6ff33cc2-d0a0-4bb3-a6c0-eb5b3213c61d}">
 		<relationship name="effects">
-			<destination>{b82c73f3-ce0c-4115-a9a8-1be171f02e88}</destination>
 			<destination>{c55e59df-406f-4e21-9d03-8cb41f6079a3}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{195831a1-9537-4814-9e45-28d90aa4a1d2}" />
 	<object class="MixerBusFader" id="{ed795267-01c3-4501-abe6-7c3bdcb5e16c}" />
-	<object class="SpatialiserEffect" id="{b82c73f3-ce0c-4115-a9a8-1be171f02e88}" />
 	<object class="MixerBusFader" id="{c55e59df-406f-4e21-9d03-8cb41f6079a3}" />
 </objects>

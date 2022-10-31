@@ -5,7 +5,7 @@
 			<value>Checkpoint</value>
 		</property>
 		<property name="outputFormat">
-			<value>2</value>
+			<value>1</value>
 		</property>
 		<relationship name="folder">
 			<destination>{71b8f2ac-198d-4084-8e5c-73ab266fd518}</destination>
@@ -122,12 +122,10 @@
 	<object class="MixerBusFader" id="{7c666e10-c4f2-4731-baf9-eaaad9fa23af}" />
 	<object class="MixerBusEffectChain" id="{3d54d6cd-8c44-4809-ba88-02c37af7c4bb}">
 		<relationship name="effects">
-			<destination>{e17f5dd8-5730-4611-bc2d-15fae3b6d66b}</destination>
 			<destination>{3a61b20c-ccbe-49b4-b6bb-e39cc36ee697}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{ae2aa6a2-f050-49ba-bf89-c21bd62ea134}" />
 	<object class="MixerBusFader" id="{15e740d5-82ca-4df6-b15c-dd09728c96de}" />
-	<object class="SpatialiserEffect" id="{e17f5dd8-5730-4611-bc2d-15fae3b6d66b}" />
 	<object class="MixerBusFader" id="{3a61b20c-ccbe-49b4-b6bb-e39cc36ee697}" />
 </objects>

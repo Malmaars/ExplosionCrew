@@ -5,7 +5,7 @@
 			<value>Game over</value>
 		</property>
 		<property name="outputFormat">
-			<value>2</value>
+			<value>1</value>
 		</property>
 		<relationship name="folder">
 			<destination>{71b8f2ac-198d-4084-8e5c-73ab266fd518}</destination>
@@ -100,6 +100,9 @@
 		</relationship>
 	</object>
 	<object class="EventMixerGroup" id="{65b201d7-3de7-4807-a906-1d7020f6c946}">
+		<property name="volume">
+			<value>-18</value>
+		</property>
 		<property name="name">
 			<value>Audio 1</value>
 		</property>
@@ -130,7 +133,6 @@
 	</object>
 	<object class="MixerBusEffectChain" id="{5ebe0a5c-a777-48a2-8f3d-f20e84768afc}">
 		<relationship name="effects">
-			<destination>{f75d4c6c-35e7-4593-9761-e172ab107190}</destination>
 			<destination>{cefde82a-d4fe-43c0-bec8-3d49b5af2181}</destination>
 		</relationship>
 	</object>
@@ -155,6 +157,5 @@
 			<value>0</value>
 		</property>
 	</object>
-	<object class="SpatialiserEffect" id="{f75d4c6c-35e7-4593-9761-e172ab107190}" />
 	<object class="MixerBusFader" id="{cefde82a-d4fe-43c0-bec8-3d49b5af2181}" />
 </objects>

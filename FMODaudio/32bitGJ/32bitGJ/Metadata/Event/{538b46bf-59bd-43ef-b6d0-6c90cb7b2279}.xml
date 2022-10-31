@@ -20,11 +20,14 @@ https://www.fmod.com/docs/studio/authoring-events.html#parameters
 
 https://www.fmod.com/docs/studio/authoring-events.html#automation-and-modulation</value>
 		</property>
+		<property name="color">
+			<value>Red</value>
+		</property>
 		<property name="name">
 			<value>Ball</value>
 		</property>
 		<property name="outputFormat">
-			<value>2</value>
+			<value>0</value>
 		</property>
 		<relationship name="folder">
 			<destination>{71b8f2ac-198d-4084-8e5c-73ab266fd518}</destination>
@@ -187,7 +190,6 @@ https://www.fmod.com/docs/studio/authoring-events.html#automation-and-modulation
 	<object class="MixerBusEffectChain" id="{1cce48ff-e367-4550-a2c6-d59d1bfcc9c2}">
 		<relationship name="effects">
 			<destination>{94b0a7f3-f281-438a-a6a1-68e621166d2a}</destination>
-			<destination>{ca255961-d37b-49ec-98c3-d3a845190f4b}</destination>
 			<destination>{7ca0d2e4-a1de-4c06-a7d2-8d7257b87a6f}</destination>
 		</relationship>
 	</object>
@@ -224,17 +226,9 @@ https://www.fmod.com/docs/studio/authoring-events.html#automation-and-modulation
 	</object>
 	<object class="MixerBusPanner" id="{389e40d4-827f-4323-b401-adbb9d44d603}" />
 	<object class="MixerBusFader" id="{94b0a7f3-f281-438a-a6a1-68e621166d2a}" />
-	<object class="ProxyEffect" id="{ca255961-d37b-49ec-98c3-d3a845190f4b}">
-		<property name="inputFormat">
-			<value>0</value>
-		</property>
-		<relationship name="preset">
-			<destination>{1ce3eecd-415d-41b1-a447-a88400ae44a0}</destination>
-		</relationship>
-	</object>
 	<object class="ProxyEffect" id="{7ca0d2e4-a1de-4c06-a7d2-8d7257b87a6f}">
 		<property name="inputFormat">
-			<value>2</value>
+			<value>0</value>
 		</property>
 		<relationship name="preset">
 			<destination>{9e54a2a9-7508-4ed6-918e-fde115117de4}</destination>
