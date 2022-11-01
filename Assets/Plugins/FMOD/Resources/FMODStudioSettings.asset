@@ -417,8 +417,8 @@ MonoBehaviour:
   switchSettingsMigration: 1
   HasSourceProject: 1
   HasPlatforms: 1
-  sourceProjectPath: FMODaudio/explosioncrew/explosioncrew.fspro
-  sourceBankPath: FMODaudio/explosioncrew/Build
+  sourceProjectPath: FMODaudio/32bitGJ/32bitGJ/32bitGJ.fspro
+  sourceBankPath: FMODaudio/32bitGJ/32bitGJ/Build
   sourceBankPathUnformatted: 
   BankRefreshCooldown: 5
   ShowBankRefreshWindow: 1
@@ -442,7 +442,10 @@ MonoBehaviour:
   MasterBanks:
   - Master
   Banks:
+  - Character
+  - Enemies
   - Music
+  - UI
   BanksToLoad: []
   LiveUpdatePort: 9264
   EnableMemoryTracking: 0
@@ -559,7 +562,7 @@ MonoBehaviour:
       Value: 0
       HasValue: 0
     Overlay:
-      Value: 1
+      Value: 0
       HasValue: 1
     Logging:
       Value: 0

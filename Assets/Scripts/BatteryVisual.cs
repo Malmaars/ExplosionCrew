@@ -8,7 +8,9 @@ public class BatteryVisual : MonoBehaviour
     PlayerV2 player;
     int currentCharge;
     RawImage[] Charges;
-    
+
+    public Renderer batteryMesh;
+    public Material fullMat, twoMat, oneMat, emptyMat;
 
     private void Awake()
     {
@@ -39,6 +41,23 @@ public class BatteryVisual : MonoBehaviour
                     Charges[i].color = Color.green;
                 }
             }
+
+            switch (player.airBoostCount)
+            {
+                case 3:
+                    batteryMesh.material = fullMat;
+                    break;
+                case 2:
+                    batteryMesh.material = twoMat;
+                    break;
+                case 1:
+                    batteryMesh.material = oneMat;
+                    break;
+                case 0:
+                    batteryMesh.material = emptyMat;
+                    break;
+            }
         }
+
     }
 }

@@ -3,16 +3,23 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Cinemachine;
+using FMODUnity;
 
 public class PlayerV2 : MonoBehaviour
 {
     [Header("Taking Damage and such")]
     public int playerHealth;
+    public int maxHealth;
     public float knockback;
     Vector3 forceBackVelocity;
     public float forceBackDrag;
     bool stunLock;
     public ParticleSystem DamageEffect;
+    bool death;
+    public ParticleSystem playerDeathParticles;
+    public GameObject GameOverScreen;
+    public StudioEventEmitter mainMusic, gameOverMusic;
+    public EventReference hurtSound;
 
 
     [Header("Air Boost")]
@@ -32,6 +39,7 @@ public class PlayerV2 : MonoBehaviour
     public Transform EnergyVisual;
     public float rechargeSpeed;
     float baseRechargeSpeed;
+    public EventReference explosion;
 
     [Header("Base Movement Variables")]
     public Animator playerAnimator;
@@ -63,7 +71,7 @@ public class PlayerV2 : MonoBehaviour
 
     [Header ("Input")]
     PlayerInputActions playerControls;
-    InputAction move, fire, jump, aim, focus, boost, attack, cameraTurn;
+    InputAction move, fire, jump, aim, focus, boost, attack, cameraTurn, start;
 
     [Header("Camera")]
     public Transform cameraFollow;
@@ -72,6 +80,7 @@ public class PlayerV2 : MonoBehaviour
     public float cameraTurnSpeed;
     bool movingCamera;
     public bool invertedCameraControls;
+    public bool intro;
     // Start is called before the first frame update
     void Awake()
     {
@@ -85,6 +94,7 @@ public class PlayerV2 : MonoBehaviour
         baseJumpSpeed = jumpSpeed;
         baseBoostSpeed = boostSpeed;
         baseRechargeSpeed = rechargeSpeed;
+        maxHealth = playerHealth;
     }
 
     private void OnEnable()
@@ -118,6 +128,10 @@ public class PlayerV2 : MonoBehaviour
         cameraTurn = playerControls.Player.DPad;
         cameraTurn.Enable();
         cameraTurn.performed += MoveCamera;
+
+        start = playerControls.Player.Start;
+        start.Enable();
+        start.performed += Respawn;
         //boost.performed += BoostToDirection;
     }
 
@@ -140,7 +154,8 @@ public class PlayerV2 : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        Debug.Log(IsGrounded());
+        if (death || intro)
+            return;
 
         playerAnimator.SetBool("Grounded", IsGrounded());
         if (!movingCamera)
@@ -283,7 +298,7 @@ public class PlayerV2 : MonoBehaviour
             {
                 movingCamera = false;
                 playerCam.Follow = transform;
-                playerCam.GetCinemachineComponent<CinemachineTransposer>().m_FollowOffset = new Vector3(0, 6, -20);
+                playerCam.GetCinemachineComponent<CinemachineTransposer>().m_FollowOffset = new Vector3(0, 8, -30);
                 //playerCam.GetCinemachineComponent<CinemachineTransposer>().m_YDamping = 0.1f;
                 //playerCam.GetCinemachineComponent<CinemachineTransposer>().m_ZDamping = 1;
             }
@@ -367,6 +382,9 @@ public class PlayerV2 : MonoBehaviour
 
     void Jump(InputAction.CallbackContext context)
     {
+        if (death || intro)
+            return;
+
         Debug.Log("jump");
         isChargingJump = false;
         EnergyVisual.localScale = new Vector3(1, 0.1f, 1);
@@ -384,6 +402,7 @@ public class PlayerV2 : MonoBehaviour
         //double jump if there's boost count to do so
         if (!IsGrounded() && airBoostCount > 0)
         {
+            RuntimeManager.PlayOneShot(explosion);
             playerAnimator.SetTrigger("BoostUp");
             rechargeSpeed = baseRechargeSpeed;
             airBoostCount--;
@@ -454,10 +473,14 @@ public class PlayerV2 : MonoBehaviour
 
     void BoostForward(InputAction.CallbackContext context)
     {
+        if (death || intro)
+            return;
+
         EnergyVisual.localScale = new Vector3(1, 0.1f, 1);
         isChargingBoost = false;
         if (airBoostCount > 0)
         {
+            RuntimeManager.PlayOneShot(explosion);
             //boostDrag = baseBoostDrag;
             airBoostCount--;
             rechargeSpeed = baseRechargeSpeed;
@@ -477,8 +500,13 @@ public class PlayerV2 : MonoBehaviour
 
     void Punch(InputAction.CallbackContext context)
     {
+        if (death || intro)
+            return;
+
         if (airBoostCount > 0)
         {
+            RuntimeManager.PlayOneShot(explosion);
+            airBoostCount--;
             //boostDrag = baseBoostDrag;
             Vector3 boostDirection = -transform.forward * boostSpeed;
             rechargeSpeed = baseRechargeSpeed;
@@ -498,6 +526,9 @@ public class PlayerV2 : MonoBehaviour
 
     void MoveCamera(InputAction.CallbackContext context)
     {
+        if (death || intro)
+            return;
+
         float distanceFromPlayer = Vector3.Distance(playerCam.transform.position, transform.position);
         Vector3 directionFromPlayer = (playerCam.transform.position - transform.position).normalized;
         Vector2 perpVector = Vector2.Perpendicular(new Vector2(directionFromPlayer.x, directionFromPlayer.z));
@@ -572,8 +603,10 @@ public class PlayerV2 : MonoBehaviour
 
     public void TakeDamage(int AmountOfDamage, Vector3 pointOfCollision)
     {
-        playerHealth -= AmountOfDamage;
+        if (playerHealth > 0)
+            playerHealth -= AmountOfDamage;
 
+        RuntimeManager.PlayOneShot(hurtSound);
         rb.velocity = Vector3.zero;
         Vector3 forceBackDirection = (transform.position - pointOfCollision).normalized;
         forceBackDirection = new Vector3(forceBackDirection.x, 0.5f, forceBackDirection.z);
@@ -584,7 +617,36 @@ public class PlayerV2 : MonoBehaviour
         DamageEffect.transform.position = pointOfCollision;
         DamageEffect.transform.forward = (transform.position - pointOfCollision).normalized;
         DamageEffect.Play();
+
+        if(playerHealth <= 0)
+        {
+            Die();
+        }
         //trigger damage animation maybe
+    }
+
+    public void Die()
+    {
+        death = true;
+        //enable Game Over screen and particles
+        mainMusic.Stop();
+        gameOverMusic.Play();
+        GameOverScreen.SetActive(true);
+        playerDeathParticles.Play();
+    }
+
+    public void Respawn(InputAction.CallbackContext context)
+    {
+        if (!death)
+            return;
+        gameOverMusic.Stop();
+        mainMusic.Play();
+        death = false;
+        playerHealth = 4;
+        GameOverScreen.SetActive(false);
+        playerDeathParticles.Stop();
+        playerDeathParticles.Clear();
+        BlackBoard.TeleportObject(BlackBoard.CurrentCheckPoint.position, transform);
     }
 
     IEnumerator DisablePunch(GameObject toDisable)

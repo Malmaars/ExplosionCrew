@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using FMODUnity;
 
 public class PauseMenu : MonoBehaviour
 {
@@ -11,6 +12,7 @@ public class PauseMenu : MonoBehaviour
     int currentlySelectedButton;
     PlayerInputActions menuControls;
     InputAction move, dPadMove, select;
+    public EventReference selectSound, moveSound;
 
     bool movedThisInput;
     // Start is called before the first frame update
@@ -64,6 +66,7 @@ public class PauseMenu : MonoBehaviour
 
     void ChangeMenuButton(int offset)
     {
+        RuntimeManager.PlayOneShot(moveSound);
         currentlySelectedButton += offset;
 
         if (currentlySelectedButton == MenuButtons.Length)
@@ -81,6 +84,10 @@ public class PauseMenu : MonoBehaviour
 
     void SelectMenuButton(InputAction.CallbackContext context)
     {
-        MenuButtons[currentlySelectedButton].onClick.Invoke();
+        if (Time.timeScale <= 0)
+        {
+            RuntimeManager.PlayOneShot(selectSound);
+            MenuButtons[currentlySelectedButton].onClick.Invoke();
+        }
     }
 }
